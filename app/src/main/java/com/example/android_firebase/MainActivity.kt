@@ -18,16 +18,12 @@ import com.google.firebase.analytics.analytics
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var analytics: FirebaseAnalytics
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        analytics = Firebase.analytics
-
         setContent {
             Android_firebaseTheme {
-                Navigation(analytics)
+                Navigation(this)
             }
         }
     }

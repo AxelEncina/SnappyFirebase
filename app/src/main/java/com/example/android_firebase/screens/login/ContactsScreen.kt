@@ -20,10 +20,10 @@ fun ContactsScreen() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Contacts Screen",
+            text = "Contactos",
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleLarge.fontSize,
-            color = Color.White,
+            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            color = Color.White
         )
     }
 }

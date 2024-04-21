@@ -2,19 +2,14 @@ package com.example.android_firebase.utils
 
 import android.content.Context
 import android.os.Bundle
-import android.util.StatsLog.logEvent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import com.google.firebase.analytics.FirebaseAnalytics
 
 class AnalyticsManager(context: Context) {
-    private val firebaseAnalytics = FirebaseAnalytics by lazy {
-        FirebaseAnalytics.getInstance(context)
-    }
-
-    fun logEvent(eventName: String, params: Bundle) {
+    private val firebaseAnalytics: FirebaseAnalytics by lazy { FirebaseAnalytics.getInstance(context) }
+    private fun logEvent(eventName: String, params: Bundle) {
         firebaseAnalytics.logEvent(eventName, params)
-        }
     }
 
     fun logButtonClicked(buttonName: String) {
@@ -43,5 +38,4 @@ class AnalyticsManager(context: Context) {
         }
         logEvent("error", params)
     }
-
 }

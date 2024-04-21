@@ -15,9 +15,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,20 +27,22 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.android_firebase.navigation.Routes
 import com.example.android_firebase.ui.theme.Purple40
+import com.example.android_firebase.utils.AnalyticsManager
 
 @Composable
 fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
     analytics.logScreenView(screenName = Routes.SignUp.route)
 
     val context = LocalContext.current
-    val email = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
 
@@ -48,15 +52,12 @@ fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Crear cuenta",
-            style = TextStyle(
-                fontSize = 40.sp,
-                color = Purple40
-            )
+            text = "Crear Cuenta",
+            style = TextStyle(fontSize = 40.sp, color = Purple40)
         )
         Spacer(modifier = Modifier.height(50.dp))
         TextField(
-            label = { Text(text = "Email") },
+            label = { Text(text = "Correo electrónico") },
             value = email,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             onValueChange = { email = it })
@@ -65,10 +66,11 @@ fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
         TextField(
             label = { Text(text = "Contraseña") },
             value = password,
+            visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             onValueChange = { password = it })
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(30.dp))
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
@@ -77,12 +79,12 @@ fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(50.dp)
             ) {
-                Text(text ="Regístrate")
+                Text(text = "Registrarse")
             }
         }
-        
+
         Spacer(modifier = Modifier.height(40.dp))
         ClickableText(
             text = AnnotatedString("¿Ya tienes cuenta? Inicia sesión"),
@@ -90,15 +92,13 @@ fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
                 navigation.popBackStack()
             },
             style = TextStyle(
-                color = Purple40,
                 fontSize = 14.sp,
                 fontFamily = FontFamily.Default,
                 textDecoration = TextDecoration.Underline,
+                color = Purple40
             )
         )
-
     }
-
 }
 
 

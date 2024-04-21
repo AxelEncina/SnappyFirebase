@@ -3,22 +3,29 @@ package com.example.android_firebase.navigation
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
+import com.example.android_firebase.screens.HomeScreen
 import com.example.android_firebase.screens.Screen
-import com.example.android_firebase.screens.home.Home
-import com.example.android_firebase.screens.login.Login
+import com.example.android_firebase.screens.auth.ForgotPasswordScreen
+import com.example.android_firebase.screens.auth.LoginScreen
+import com.example.android_firebase.screens.auth.SignUpScreen
+import com.example.android_firebase.utils.AnalyticsManager
+import com.example.android_firebase.utils.AuthManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.logEvent
+import com.google.firebase.auth.FirebaseUser
 
 
 @Composable
 fun Navigation(context: Context, navController: NavHostController = rememberNavController()) {
     var analytics: AnalyticsManager = AnalyticsManager(context)
+    val authManager: AuthManager = AuthManager()
+
+
+    val user: FirebaseUser? = authManager.getCurrentUser()
 
     Screen {
         NavHost(
@@ -28,6 +35,7 @@ fun Navigation(context: Context, navController: NavHostController = rememberNavC
             composable(Routes.Login.route) {
                 LoginScreen(
                     analytics = analytics,
+                    auth = authManager,
                     navigation = navController,
                     )
             }
@@ -35,6 +43,7 @@ fun Navigation(context: Context, navController: NavHostController = rememberNavC
             composable(Routes.Home.route) {
                 HomeScreen(
                     analytics = analytics,
+                    auth = authManager,
                     navigation = navController,
                 )
             }
