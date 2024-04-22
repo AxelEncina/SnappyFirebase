@@ -1,6 +1,7 @@
 package com.example.android_firebase.screens.auth
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -110,7 +111,9 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-
+                    scope.launch {
+                        emailPassSignIn(email, password, auth, analytics, context, navigation)
+                    }
                 },
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
@@ -174,6 +177,28 @@ private suspend fun incognitoSignIn(auth: AuthManager, analytics: AnalyticsManag
         is AuthRes.Error -> {
             analytics.logError("Error SignIn Incognito: ${result.errorMessage}")
         }
+    }
+}
+
+private suspend fun emailPassSignIn(email: String, password: String, auth: AuthManager, analytics: AnalyticsManager, context: Context, navigation: NavController) {
+    if(email.isNotEmpty() && password.isNotEmpty()) {
+        when (val result = auth.signInWithEmailAndPassword(email, password)) {
+            is AuthRes.Success -> {
+                analytics.logButtonClicked("Click: Iniciar sesión correo & contraseña")
+                navigation.navigate(Routes.Home.route) {
+                    popUpTo(Routes.Login.route) {
+                        inclusive = true
+                    }
+                }
+            }
+
+            is AuthRes.Error -> {
+                analytics.logButtonClicked("Error SignUp: ${result.errorMessage}")
+                Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    } else {
+        Toast.makeText(context, "Existen campos vacios", Toast.LENGTH_SHORT).show()
     }
 }
 

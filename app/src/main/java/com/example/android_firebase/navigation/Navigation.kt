@@ -30,7 +30,7 @@ fun Navigation(context: Context, navController: NavHostController = rememberNavC
     Screen {
         NavHost(
             navController = navController,
-            startDestination = Routes.Login.route
+            startDestination = if(user == null) Routes.Login.route else Routes.Home.route
         ) {
             composable(Routes.Login.route) {
                 LoginScreen(
@@ -51,6 +51,7 @@ fun Navigation(context: Context, navController: NavHostController = rememberNavC
             composable(Routes.SignUp.route) {
                 SignUpScreen(
                     analytics = analytics,
+                    auth = authManager,
                     navigation = navController,
                 )
             }
@@ -58,9 +59,9 @@ fun Navigation(context: Context, navController: NavHostController = rememberNavC
             composable(Routes.ForgotPassword.route) {
                 ForgotPasswordScreen(
                     analytics = analytics,
+                    auth = authManager,
                     navigation = navController,
                 )
-
             }
         }
     }

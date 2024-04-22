@@ -1,5 +1,8 @@
 package com.example.android_firebase.screens.auth
 
+import android.content.Context
+import android.os.Bundle
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,9 +38,13 @@ import androidx.navigation.NavController
 import com.example.android_firebase.navigation.Routes
 import com.example.android_firebase.ui.theme.Purple40
 import com.example.android_firebase.utils.AnalyticsManager
+import com.example.android_firebase.utils.AuthManager
+import com.example.android_firebase.utils.AuthRes
+import com.google.firebase.analytics.FirebaseAnalytics
+import kotlinx.coroutines.launch
 
 @Composable
-fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
+fun SignUpScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
     analytics.logScreenView(screenName = Routes.SignUp.route)
 
     val context = LocalContext.current
@@ -74,7 +81,9 @@ fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-
+                    scope.launch {
+                        signUp(email, password, auth, analytics, context, navigation)
+                    }
                 },
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
@@ -98,6 +107,28 @@ fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
                 color = Purple40
             )
         )
+    }
+}
+
+private suspend fun signUp(email: String, password: String, auth: AuthManager, analytics: AnalyticsManager, context: Context, navigation: NavController) {
+    if (email.isNotEmpty() && password.isNotEmpty()) {
+        when(val result = auth.createUserWithEmailAndPassword(email, password)) {
+            is AuthRes.Success -> {
+                analytics.logButtonClicked(FirebaseAnalytics.Event.SIGN_UP)
+                Toast.makeText(context, "Usuario creado correctamente", Toast.LENGTH_SHORT).show()
+                navigation.popBackStack()
+            }
+            is AuthRes.Error -> {
+                analytics.logButtonClicked("Error al crear usuario ${result.errorMessage}")
+                Toast.makeText(context, "Error al crear usuario ${result.errorMessage}", Toast.LENGTH_SHORT).show(
+                )
+            }
+        }
+    } else {
+        Toast.makeText(context, "Email y contraseña no pueden estar vacíos", Toast.LENGTH_SHORT).show()
+        analytics.logEvent("sign_up_error", Bundle().apply {
+            putString("error", "Email y contraseña no pueden estar vacíos")
+        })
     }
 }
 
