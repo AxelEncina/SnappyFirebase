@@ -2,6 +2,8 @@ package com.example.android_firebase.screens.auth
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -50,6 +52,8 @@ import com.example.android_firebase.ui.theme.Purple40
 import com.example.android_firebase.utils.AnalyticsManager
 import com.example.android_firebase.utils.AuthManager
 import com.example.android_firebase.utils.AuthRes
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 
 @Composable
@@ -61,6 +65,30 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()) { result ->
+        when(val account = auth.handleSignInResult(GoogleSignIn.getSignedInAccountFromIntent(result.data))) {
+            is AuthRes.Success -> {
+                val credential = GoogleAuthProvider.getCredential(account?.data?.idToken, null)
+                scope.launch {
+                    val firebaseUser = auth.signInWithGoogleCredential(credential)
+                    if (firebaseUser != null) {
+                        Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+                        analytics.logButtonClicked("Click: Continuar con Google")
+                        navigation.navigate(Routes.Home.route) {
+                            popUpTo(Routes.Login.route) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+            }
+            is AuthRes.Error -> {
+                analytics.logError("Error SignIn Google: ${account.errorMessage}")
+                Toast.makeText(context, "Error SignIn Google: ${account.errorMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         ClickableText(
@@ -93,7 +121,8 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
         Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = "Firebase Android",
-            style = TextStyle(fontSize = 30.sp))
+            style = TextStyle(fontSize = 30.sp)
+        )
         Spacer(modifier = Modifier.height(30.dp))
         TextField(
             label = { Text(text = "Correo electrónico") },
@@ -144,7 +173,7 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
         Spacer(modifier = Modifier.height(25.dp))
         SocialMediaButton(
             onClick = {
-                scope.launch{
+                scope.launch {
                     incognitoSignIn(auth, analytics, context, navigation)
                 }
             },
@@ -155,7 +184,7 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
         Spacer(modifier = Modifier.height(15.dp))
         SocialMediaButton(
             onClick = {
-
+                auth.signInWithGoogle(googleSignInLauncher)
             },
             text = "Continuar con Google",
             icon = R.drawable.ic_google,
@@ -164,8 +193,13 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
     }
 }
 
-private suspend fun incognitoSignIn(auth: AuthManager, analytics: AnalyticsManager, context: Context, navigation: NavController) {
-    when(val result = auth.signInAnonymously()) {
+private suspend fun incognitoSignIn(
+    auth: AuthManager,
+    analytics: AnalyticsManager,
+    context: Context,
+    navigation: NavController
+) {
+    when (val result = auth.signInAnonymously()) {
         is AuthRes.Success -> {
             analytics.logButtonClicked("Click: Continuar como invitado")
             navigation.navigate(Routes.Home.route) {
@@ -174,14 +208,22 @@ private suspend fun incognitoSignIn(auth: AuthManager, analytics: AnalyticsManag
                 }
             }
         }
+
         is AuthRes.Error -> {
             analytics.logError("Error SignIn Incognito: ${result.errorMessage}")
         }
     }
 }
 
-private suspend fun emailPassSignIn(email: String, password: String, auth: AuthManager, analytics: AnalyticsManager, context: Context, navigation: NavController) {
-    if(email.isNotEmpty() && password.isNotEmpty()) {
+private suspend fun emailPassSignIn(
+    email: String,
+    password: String,
+    auth: AuthManager,
+    analytics: AnalyticsManager,
+    context: Context,
+    navigation: NavController
+) {
+    if (email.isNotEmpty() && password.isNotEmpty()) {
         when (val result = auth.signInWithEmailAndPassword(email, password)) {
             is AuthRes.Success -> {
                 analytics.logButtonClicked("Click: Iniciar sesión correo & contraseña")
@@ -194,7 +236,8 @@ private suspend fun emailPassSignIn(email: String, password: String, auth: AuthM
 
             is AuthRes.Error -> {
                 analytics.logButtonClicked("Error SignUp: ${result.errorMessage}")
-                Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     } else {
@@ -203,17 +246,24 @@ private suspend fun emailPassSignIn(email: String, password: String, auth: AuthM
 }
 
 @Composable
-fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color, ) {
+fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color) {
     var click by remember { mutableStateOf(false) }
     Surface(
         onClick = onClick,
-        modifier = Modifier.padding(start = 40.dp, end = 40.dp).clickable { click = !click },
+        modifier = Modifier
+            .padding(start = 40.dp, end = 40.dp)
+            .clickable { click = !click },
         shape = RoundedCornerShape(50),
-        border = BorderStroke(width = 1.dp, color = if(icon == R.drawable.ic_incognito) color else Color.Gray),
+        border = BorderStroke(
+            width = 1.dp,
+            color = if (icon == R.drawable.ic_incognito) color else Color.Gray
+        ),
         color = color
     ) {
         Row(
-            modifier = Modifier.padding(start = 12.dp, end = 16.dp, top = 12.dp, bottom = 12.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(start = 12.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -224,7 +274,10 @@ fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color
                 tint = Color.Unspecified
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "$text", color = if(icon == R.drawable.ic_incognito) Color.White else Color.Black)
+            Text(
+                text = "$text",
+                color = if (icon == R.drawable.ic_incognito) Color.White else Color.Black
+            )
             click = true
         }
     }

@@ -35,6 +35,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.android_firebase.R
 import com.example.android_firebase.navigation.Routes
 import com.example.android_firebase.screens.login.ContactsScreen
@@ -73,7 +77,7 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
         }
     }
 
-    Scaffold (
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -81,8 +85,19 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if(user?.photoUrl != null) {
-
+                        if (user?.photoUrl != null) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(user.photoUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Foto de perfil",
+                                placeholder = painterResource(id = R.drawable.profile),
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    //.padding(end = 8.dp)
+                                    .size(40.dp)
+                                    .clip(CircleShape))
                         } else {
                             Image(
                                 painter = painterResource(R.drawable.profile),
@@ -96,16 +111,17 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenidx",
+                                text = if (!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenidx",
                                 fontSize = 20.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
-                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
+                                text = if (!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
                                 fontSize = 12.sp,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis)
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
                     }
                 },
@@ -124,7 +140,7 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
         bottomBar = {
             BottomBar(navController = navController)
         }
-    ){ contentPadding ->
+    ) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             if (showDialog) {
                 LogoutDialog(onConfirmLogout = {
@@ -182,7 +198,11 @@ fun BottomBar(navController: NavHostController) {
 }
 
 @Composable
-fun RowScope.AddItem(screens: BottomNavScreen, currentDestination: NavDestination, navController: NavHostController) {
+fun RowScope.AddItem(
+    screens: BottomNavScreen,
+    currentDestination: NavDestination,
+    navController: NavHostController
+) {
     NavigationBarItem(
         label = { Text(text = screens.title) },
         icon = { Icon(imageVector = screens.icon, contentDescription = "Icons") },
@@ -216,6 +236,7 @@ sealed class BottomNavScreen(val route: String, val title: String, val icon: Ima
         title = "Contactos",
         icon = Icons.Default.Person
     )
+
     object Note : BottomNavScreen(
         route = "notes",
         title = "Notas",
