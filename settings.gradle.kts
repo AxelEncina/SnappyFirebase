@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "android_firebase"
+rootProject.name = "SnappyFirebase"
 include(":app")
  

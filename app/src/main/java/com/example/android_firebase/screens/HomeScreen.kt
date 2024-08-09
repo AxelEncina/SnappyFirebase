@@ -1,5 +1,6 @@
 package com.example.android_firebase.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,10 +54,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.android_firebase.R
 import com.example.android_firebase.navigation.Routes
-import com.example.android_firebase.screens.login.ContactsScreen
-import com.example.android_firebase.screens.login.NotesScreen
+import com.example.android_firebase.screens.db.ContactsScreen
+import com.example.android_firebase.screens.db.NotesScreen
 import com.example.android_firebase.utils.AnalyticsManager
 import com.example.android_firebase.utils.AuthManager
+import com.example.android_firebase.utils.RealtimeManager
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +70,8 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
     val user = auth.getCurrentUser()
 
     var showDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     val onLogoutConfirmed: () -> Unit = {
         auth.signOut()
@@ -130,6 +135,7 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
                     IconButton(
                         onClick = {
                             showDialog = true
+
                         }
                     ) {
                         Icon(Icons.Outlined.ExitToApp, contentDescription = "Cerrar sesión")
@@ -148,7 +154,7 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
                     showDialog = false
                 }, onDismiss = { showDialog = false })
             }
-            BottomNavGraph(navController = navController)
+            BottomNavGraph(navController = navController, context = context, authManager = auth)
         }
     }
 }
@@ -219,10 +225,12 @@ fun RowScope.AddItem(
 }
 
 @Composable
-fun BottomNavGraph(navController: NavHostController) {
+fun BottomNavGraph(navController: NavHostController, context: Context, authManager: AuthManager) {
+    val realtime = RealtimeManager(context)
+
     NavHost(navController = navController, startDestination = BottomNavScreen.Contact.route) {
         composable(route = BottomNavScreen.Contact.route) {
-            ContactsScreen()
+            ContactsScreen(realtime = realtime, authManager = authManager)
         }
         composable(route = BottomNavScreen.Note.route) {
             NotesScreen()

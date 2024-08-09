@@ -19,15 +19,14 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 sealed class AuthRes<out T> {
-    data class Success<T>(val data: T) : AuthRes<T>()
-    data class Error(val errorMessage: String) : AuthRes<Nothing>()
-
+    data class Success<T>(val data: T): AuthRes<T>()
+    data class Error(val errorMessage: String): AuthRes<Nothing>()
 }
 
 class AuthManager(private val context: Context) {
     private val auth: FirebaseAuth by lazy { Firebase.auth }
 
-    private val signInClient = Identity.getSignInClient(context) //instancia de la sesion del cliente de google
+    private val signInClient = Identity.getSignInClient(context)
 
     suspend fun signInAnonymously(): AuthRes<FirebaseUser> {
         return try {
@@ -38,19 +37,21 @@ class AuthManager(private val context: Context) {
         }
     }
 
-    suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthRes<FirebaseUser> {
+
+
+    suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthRes<FirebaseUser?> {
         return try {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-            AuthRes.Success(authResult.user ?: throw Exception("Error al crear usuario"))
+            AuthRes.Success(authResult.user)
         } catch(e: Exception) {
-            AuthRes.Error(e.message ?: "Error al crear usuario")
+            AuthRes.Error(e.message ?: "Error al crear el usuario")
         }
     }
 
-    suspend fun signInWithEmailAndPassword(email: String, password: String): AuthRes<FirebaseUser> {
+    suspend fun signInWithEmailAndPassword(email: String, password: String): AuthRes<FirebaseUser?> {
         return try {
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
-            AuthRes.Success(authResult.user ?: throw Exception("Error al iniciar sesión"))
+            AuthRes.Success(authResult.user)
         } catch(e: Exception) {
             AuthRes.Error(e.message ?: "Error al iniciar sesión")
         }
@@ -74,15 +75,6 @@ class AuthManager(private val context: Context) {
         return auth.currentUser
     }
 
-    fun handleSignInResult(task: Task<GoogleSignInAccount>): AuthRes<GoogleSignInAccount> {
-        return try {
-            val account = task.getResult(ApiException::class.java)
-            AuthRes.Success(account)
-        } catch (e: ApiException) {
-            AuthRes.Error(e.message ?: "Error al iniciar sesión con Google")
-        }
-    }
-
     private val googleSignInClient: GoogleSignInClient by lazy {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(context.getString(R.string.default_web_client_id))
@@ -91,22 +83,29 @@ class AuthManager(private val context: Context) {
         GoogleSignIn.getClient(context, gso)
     }
 
-    suspend fun signInWithGoogleCredential(credential: AuthCredential): AuthRes<FirebaseUser> {
+    fun handleSignInResult(task: Task<GoogleSignInAccount>): AuthRes<GoogleSignInAccount>? {
+        return try {
+            val account = task.getResult(ApiException::class.java)
+            AuthRes.Success(account)
+        } catch (e: ApiException) {
+            AuthRes.Error(e.message ?: "Google sign-in failed.")
+        }
+    }
+
+    suspend fun signInWithGoogleCredential(credential: AuthCredential): AuthRes<FirebaseUser>? {
         return try {
             val firebaseUser = auth.signInWithCredential(credential).await()
             firebaseUser.user?.let {
                 AuthRes.Success(it)
-            } ?: throw Exception("Error al iniciar sesión con Google")
-        } catch(e: Exception) {
-            AuthRes.Error(e.message ?: "Error al iniciar sesión con Google")
+            } ?: throw Exception("Sign in with Google failed.")
+        } catch (e: Exception) {
+            AuthRes.Error(e.message ?: "Sign in with Google failed.")
         }
     }
 
-    fun signInWithGoogle(gogleSignInLauncher: ActivityResultLauncher<Intent>) {
+    fun signInWithGoogle(googleSignInLauncher: ActivityResultLauncher<Intent>) {
         val signInIntent = googleSignInClient.signInIntent
-        gogleSignInLauncher.launch(signInIntent)
+        googleSignInLauncher.launch(signInIntent)
     }
-
-
 
 }

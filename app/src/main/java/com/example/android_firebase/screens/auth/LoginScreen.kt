@@ -6,6 +6,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,10 +24,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,17 +44,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.android_firebase.R
 import com.example.android_firebase.navigation.Routes
 import com.example.android_firebase.ui.theme.Purple40
+import com.example.android_firebase.ui.theme.amarillo
+import com.example.android_firebase.ui.theme.amarillo2
+import com.example.android_firebase.ui.theme.celeste
+import com.example.android_firebase.ui.theme.letra
+import com.example.android_firebase.ui.theme.verde
 import com.example.android_firebase.utils.AnalyticsManager
 import com.example.android_firebase.utils.AuthManager
 import com.example.android_firebase.utils.AuthRes
@@ -56,6 +71,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
     analytics.logScreenView(screenName = Routes.Login.route)
@@ -65,18 +81,22 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val lazyDog = FontFamily(
+        Font(R.font.lazy_dog)
+    )
+
+
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()) { result ->
         when(val account = auth.handleSignInResult(GoogleSignIn.getSignedInAccountFromIntent(result.data))) {
             is AuthRes.Success -> {
                 val credential = GoogleAuthProvider.getCredential(account?.data?.idToken, null)
                 scope.launch {
-                    val firebaseUser = auth.signInWithGoogleCredential(credential)
-                    if (firebaseUser != null) {
-                        Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                        analytics.logButtonClicked("Click: Continuar con Google")
-                        navigation.navigate(Routes.Home.route) {
-                            popUpTo(Routes.Login.route) {
+                    val fireUser = auth.signInWithGoogleCredential(credential)
+                    if (fireUser != null){
+                        Toast.makeText(context, "Bienvenidx", Toast.LENGTH_SHORT).show()
+                        navigation.navigate(Routes.Home.route){
+                            popUpTo(Routes.Login.route){
                                 inclusive = true
                             }
                         }
@@ -84,61 +104,66 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
                 }
             }
             is AuthRes.Error -> {
-                analytics.logError("Error SignIn Google: ${account.errorMessage}")
-                Toast.makeText(context, "Error SignIn Google: ${account.errorMessage}", Toast.LENGTH_SHORT).show()
+                analytics.logError("Error SignIn: ${account.errorMessage}")
+                Toast.makeText(context, "Error: ${account.errorMessage}", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                Toast.makeText(context, "Error desconocido", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        ClickableText(
-            text = AnnotatedString("¿No tienes una cuenta? Regístrate"),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(40.dp),
-            onClick = {
-                navigation.navigate(Routes.SignUp.route)
-                analytics.logButtonClicked("Click: No tienes una cuenta? Regístrate")
-            },
-            style = TextStyle(
-                fontSize = 14.sp,
-                fontFamily = FontFamily.Default,
-                textDecoration = TextDecoration.Underline,
-                color = Purple40
-            )
-        )
-    }
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_firebase),
-            contentDescription = "Firebase",
-            modifier = Modifier.size(100.dp)
+            painter = painterResource(id = R.drawable.ic_snappy),
+            contentDescription = "Logo de SnappyAI",
+            modifier = Modifier.size(200.dp)
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(
-            text = "Firebase Android",
-            style = TextStyle(fontSize = 30.sp)
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = amarillo)) {
+                    append("SNAPPY")
+                }
+                withStyle(style = SpanStyle(color = celeste)) {
+                    append("AI")
+                }
+            },
+            style = TextStyle(fontSize = 30.sp, fontFamily = lazyDog)
         )
-        Spacer(modifier = Modifier.height(30.dp))
-        TextField(
-            label = { Text(text = "Correo electrónico") },
+
+        Spacer(modifier = Modifier.height(5.dp))
+        OutlinedTextField(
+            label = { Text(text = "Correo electrónico", color = letra) },
             value = email,
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color.Transparent,
+                focusedIndicatorColor = amarillo2,
+                unfocusedIndicatorColor = amarillo,
+                cursorColor = Color.Yellow
+            ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             onValueChange = { email = it })
         Spacer(modifier = Modifier.height(10.dp))
-        TextField(
-            label = { Text(text = "Contraseña") },
+        OutlinedTextField(
+            label = { Text(text = "Contraseña", color = letra) },
             value = password,
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color.Transparent,
+                focusedIndicatorColor = amarillo2,
+                unfocusedIndicatorColor = amarillo,
+                cursorColor = Color.Yellow
+            ),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             onValueChange = { password = it })
         Spacer(modifier = Modifier.height(20.dp))
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-            Button(
+            OutlinedButton(
                 onClick = {
                     scope.launch {
                         emailPassSignIn(email, password, auth, analytics, context, navigation)
@@ -148,11 +173,12 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
+                    .border(1.dp, amarillo, shape = RoundedCornerShape(50.dp))
             ) {
-                Text(text = "Iniciar Sesión".uppercase())
+                Text(text = "Iniciar Sesión".uppercase(), color = amarillo)
             }
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         ClickableText(
             text = AnnotatedString("¿Olvidaste tu contraseña?"),
             onClick = {
@@ -162,18 +188,18 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
                 analytics.logButtonClicked("Click: ¿Olvidaste tu contraseña?")
             },
             style = TextStyle(
-                fontSize = 14.sp,
+                fontSize = 18.sp,
                 fontFamily = FontFamily.Default,
                 textDecoration = TextDecoration.Underline,
-                color = Purple40
+                color = amarillo2
             )
         )
-        Spacer(modifier = Modifier.height(25.dp))
-        Text(text = "-------- o --------", style = TextStyle(color = Color.Gray))
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(text = "-------- o --------", style = TextStyle(color = amarillo2))
+        Spacer(modifier = Modifier.height(5.dp))
         SocialMediaButton(
             onClick = {
-                scope.launch {
+                scope.launch{
                     incognitoSignIn(auth, analytics, context, navigation)
                 }
             },
@@ -190,16 +216,43 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
             icon = R.drawable.ic_google,
             color = Color(0xFFF1F1F1)
         )
+        Spacer(modifier = Modifier.height(1.dp))
+        /*ClickableText(
+            text = AnnotatedString("Forzar cierre Crashlytics"),
+            onClick = {
+
+            },
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontFamily = FontFamily.Default,
+                textDecoration = TextDecoration.Underline,
+                color = Purple40
+            )
+        )*/
+        Spacer(modifier = Modifier.height(1.dp))
+        Box(modifier = Modifier.fillMaxSize()) {
+            ClickableText(
+                text = AnnotatedString("¿No tienes una cuenta? Regístrate"),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(40.dp),
+                onClick = {
+                    navigation.navigate(Routes.SignUp.route)
+                    analytics.logButtonClicked("Click: No tienes una cuenta? Regístrate")
+                },
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily.Default,
+                    textDecoration = TextDecoration.Underline,
+                    color = Purple40
+                )
+            )
+        }
     }
 }
 
-private suspend fun incognitoSignIn(
-    auth: AuthManager,
-    analytics: AnalyticsManager,
-    context: Context,
-    navigation: NavController
-) {
-    when (val result = auth.signInAnonymously()) {
+private suspend fun incognitoSignIn(auth: AuthManager, analytics: AnalyticsManager, context: Context, navigation: NavController) {
+    when(val result = auth.signInAnonymously()) {
         is AuthRes.Success -> {
             analytics.logButtonClicked("Click: Continuar como invitado")
             navigation.navigate(Routes.Home.route) {
@@ -208,22 +261,14 @@ private suspend fun incognitoSignIn(
                 }
             }
         }
-
         is AuthRes.Error -> {
             analytics.logError("Error SignIn Incognito: ${result.errorMessage}")
         }
     }
 }
 
-private suspend fun emailPassSignIn(
-    email: String,
-    password: String,
-    auth: AuthManager,
-    analytics: AnalyticsManager,
-    context: Context,
-    navigation: NavController
-) {
-    if (email.isNotEmpty() && password.isNotEmpty()) {
+private suspend fun emailPassSignIn(email: String, password: String, auth: AuthManager, analytics: AnalyticsManager, context: Context, navigation: NavController) {
+    if(email.isNotEmpty() && password.isNotEmpty()) {
         when (val result = auth.signInWithEmailAndPassword(email, password)) {
             is AuthRes.Success -> {
                 analytics.logButtonClicked("Click: Iniciar sesión correo & contraseña")
@@ -236,8 +281,7 @@ private suspend fun emailPassSignIn(
 
             is AuthRes.Error -> {
                 analytics.logButtonClicked("Error SignUp: ${result.errorMessage}")
-                Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
             }
         }
     } else {
@@ -246,24 +290,17 @@ private suspend fun emailPassSignIn(
 }
 
 @Composable
-fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color) {
+fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color, ) {
     var click by remember { mutableStateOf(false) }
     Surface(
         onClick = onClick,
-        modifier = Modifier
-            .padding(start = 40.dp, end = 40.dp)
-            .clickable { click = !click },
+        modifier = Modifier.padding(start = 40.dp, end = 40.dp).clickable { click = !click },
         shape = RoundedCornerShape(50),
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (icon == R.drawable.ic_incognito) color else Color.Gray
-        ),
-        color = color
+        border = BorderStroke(width = 1.dp, color = if(icon == R.drawable.ic_incognito) Color.Gray else amarillo),
+        color = Color.Transparent
     ) {
         Row(
-            modifier = Modifier
-                .padding(start = 12.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(start = 12.dp, end = 16.dp, top = 12.dp, bottom = 12.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -274,10 +311,7 @@ fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color
                 tint = Color.Unspecified
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "$text",
-                color = if (icon == R.drawable.ic_incognito) Color.White else Color.Black
-            )
+            Text(text = "$text", color = letra)
             click = true
         }
     }

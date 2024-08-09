@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun Navigation(context: Context, navController: NavHostController = rememberNavController()) {
-    var analytics: AnalyticsManager = AnalyticsManager(context)
+    val analytics: AnalyticsManager = AnalyticsManager(context)
     val authManager: AuthManager = AuthManager(context)
 
 
