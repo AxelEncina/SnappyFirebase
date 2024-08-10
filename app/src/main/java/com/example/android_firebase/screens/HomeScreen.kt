@@ -58,6 +58,7 @@ import com.example.android_firebase.screens.db.ContactsScreen
 import com.example.android_firebase.screens.db.NotesScreen
 import com.example.android_firebase.utils.AnalyticsManager
 import com.example.android_firebase.utils.AuthManager
+import com.example.android_firebase.utils.FirestoreManager
 import com.example.android_firebase.utils.RealtimeManager
 
 
@@ -227,13 +228,13 @@ fun RowScope.AddItem(
 @Composable
 fun BottomNavGraph(navController: NavHostController, context: Context, authManager: AuthManager) {
     val realtime = RealtimeManager(context)
-
+    val firestore = FirestoreManager(context)
     NavHost(navController = navController, startDestination = BottomNavScreen.Contact.route) {
         composable(route = BottomNavScreen.Contact.route) {
             ContactsScreen(realtime = realtime, authManager = authManager)
         }
         composable(route = BottomNavScreen.Note.route) {
-            NotesScreen()
+            NotesScreen(firestore = firestore)
         }
     }
 }
