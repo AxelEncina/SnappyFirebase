@@ -16,13 +16,13 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
+    primary = fondo, //antes estaba en 0xFF121212
     secondary = PurpleGrey80,
     tertiary = Pink80
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
+    primary = fondo,
     secondary = PurpleGrey40,
     tertiary = Pink40
 
@@ -48,6 +48,11 @@ fun Android_firebaseTheme(
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+
+            //quiero configurar el tema para que no improta si es dark o light, que tenga no action bar
+            //val window = (context as Activity).window
+            //window.setDecorFitsSystemWindows(false)
+
         }
 
         darkTheme -> DarkColorScheme

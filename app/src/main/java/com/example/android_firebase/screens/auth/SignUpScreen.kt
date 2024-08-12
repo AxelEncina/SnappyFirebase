@@ -15,8 +15,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -37,12 +42,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.android_firebase.navigation.Routes
 import com.example.android_firebase.ui.theme.Purple40
+import com.example.android_firebase.ui.theme.amarillo
+import com.example.android_firebase.ui.theme.amarillo2
+import com.example.android_firebase.ui.theme.letra
 import com.example.android_firebase.utils.AnalyticsManager
 import com.example.android_firebase.utils.AuthManager
 import com.example.android_firebase.utils.AuthRes
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
     analytics.logScreenView(screenName = Routes.SignUp.route)
@@ -59,20 +68,32 @@ fun SignUpScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: Nav
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Crear Cuenta",
-            style = TextStyle(fontSize = 40.sp, color = Purple40)
+            text = "Crear una cuenta",
+            style = TextStyle(fontSize = 40.sp, color = amarillo)
         )
         Spacer(modifier = Modifier.height(50.dp))
-        TextField(
-            label = { Text(text = "Correo electrónico") },
+        OutlinedTextField(
+            label = { Text(text = "Correo electrónico", color = letra) },
             value = email,
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color.Transparent,
+                focusedIndicatorColor = amarillo2,
+                unfocusedIndicatorColor = amarillo,
+                cursorColor = Color.Yellow
+            ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             onValueChange = { email = it })
 
         Spacer(modifier = Modifier.height(20.dp))
-        TextField(
-            label = { Text(text = "Contraseña") },
+        OutlinedTextField(
+            label = { Text(text = "Contraseña", color = letra) },
             value = password,
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color.Transparent,
+                focusedIndicatorColor = amarillo2,
+                unfocusedIndicatorColor = amarillo,
+                cursorColor = Color.Yellow
+            ),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             onValueChange = { password = it })
@@ -88,15 +109,16 @@ fun SignUpScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: Nav
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(amarillo2)
             ) {
-                Text(text = "Registrarse")
+                Text(text = "Registrarse", color = Color.Black)
             }
         }
 
         Spacer(modifier = Modifier.height(40.dp))
         ClickableText(
-            text = AnnotatedString("¿Ya tienes cuenta? Inicia sesión"),
+            text = AnnotatedString("¿Ya tienes una cuenta? Inicia sesión"),
             onClick = {
                 navigation.popBackStack()
             },
@@ -104,7 +126,7 @@ fun SignUpScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: Nav
                 fontSize = 14.sp,
                 fontFamily = FontFamily.Default,
                 textDecoration = TextDecoration.Underline,
-                color = Purple40
+                color = amarillo2
             )
         )
     }

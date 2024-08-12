@@ -118,6 +118,7 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(50.dp))
         Image(
             painter = painterResource(id = R.drawable.ic_snappy),
             contentDescription = "Logo de SnappyAI",
@@ -178,7 +179,7 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
                 Text(text = "Iniciar Sesión".uppercase(), color = amarillo)
             }
         }
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(15.dp))
         ClickableText(
             text = AnnotatedString("¿Olvidaste tu contraseña?"),
             onClick = {
@@ -194,9 +195,9 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
                 color = amarillo2
             )
         )
-        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Text(text = "-------- o --------", style = TextStyle(color = amarillo2))
-        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         SocialMediaButton(
             onClick = {
                 scope.launch{
@@ -244,7 +245,7 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
                     fontSize = 14.sp,
                     fontFamily = FontFamily.Default,
                     textDecoration = TextDecoration.Underline,
-                    color = Purple40
+                    color = amarillo2
                 )
             )
         }

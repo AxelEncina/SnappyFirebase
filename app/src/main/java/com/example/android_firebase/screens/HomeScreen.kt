@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.ExitToApp
@@ -56,8 +57,10 @@ import com.example.android_firebase.R
 import com.example.android_firebase.navigation.Routes
 import com.example.android_firebase.screens.db.ContactsScreen
 import com.example.android_firebase.screens.db.NotesScreen
+import com.example.android_firebase.ui.storage.CloudStorageScreen
 import com.example.android_firebase.utils.AnalyticsManager
 import com.example.android_firebase.utils.AuthManager
+import com.example.android_firebase.utils.CloudStorageManager
 import com.example.android_firebase.utils.FirestoreManager
 import com.example.android_firebase.utils.RealtimeManager
 
@@ -187,7 +190,8 @@ fun LogoutDialog(onConfirmLogout: () -> Unit, onDismiss: () -> Unit) {
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         BottomNavScreen.Contact,
-        BottomNavScreen.Note
+        BottomNavScreen.Note,
+        BottomNavScreen.Photos
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -229,6 +233,7 @@ fun RowScope.AddItem(
 fun BottomNavGraph(navController: NavHostController, context: Context, authManager: AuthManager) {
     val realtime = RealtimeManager(context)
     val firestore = FirestoreManager(context)
+    val storage = CloudStorageManager(context)
     NavHost(navController = navController, startDestination = BottomNavScreen.Contact.route) {
         composable(route = BottomNavScreen.Contact.route) {
             ContactsScreen(realtime = realtime, authManager = authManager)
@@ -236,17 +241,26 @@ fun BottomNavGraph(navController: NavHostController, context: Context, authManag
         composable(route = BottomNavScreen.Note.route) {
             NotesScreen(firestore = firestore)
         }
+        composable(route = BottomNavScreen.Photos.route) {
+            CloudStorageScreen(storage = storage)
+        }
     }
 }
 
 sealed class BottomNavScreen(val route: String, val title: String, val icon: ImageVector) {
-    object Contact : BottomNavScreen(
+    data object Photos : BottomNavScreen(
+        route = "photos",
+        title = "Photos",
+        icon = Icons.Default.Face
+    )
+
+    data object Contact : BottomNavScreen(
         route = "contact",
         title = "Contactos",
         icon = Icons.Default.Person
     )
 
-    object Note : BottomNavScreen(
+    data object Note : BottomNavScreen(
         route = "notes",
         title = "Notas",
         icon = Icons.Default.List
