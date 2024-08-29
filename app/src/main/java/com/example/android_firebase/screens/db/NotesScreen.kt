@@ -1,6 +1,7 @@
 package com.example.android_firebase.screens.db
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,12 +21,15 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,12 +39,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.android_firebase.model.Note
+import com.example.android_firebase.ui.theme.amarillo
+import com.example.android_firebase.ui.theme.amarillo2
+import com.example.android_firebase.ui.theme.celeste
+import com.example.android_firebase.ui.theme.fondo
 import com.example.android_firebase.utils.FirestoreManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,11 +67,12 @@ fun NotesScreen(firestore: FirestoreManager) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
+                containerColor = fondo,
                 onClick = {
                     showAddNoteDialog = true
                 },
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Note")
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Agregar una Nota", tint = amarillo)
             }
             if (showAddNoteDialog) {
                 AddNoteDialog(
@@ -130,6 +140,7 @@ fun NoteItem(note: Note, firestore: FirestoreManager) {
 
     Card(
         modifier = Modifier.padding(6.dp),
+
     ) {
         Column(
             modifier = Modifier
@@ -154,6 +165,7 @@ fun NoteItem(note: Note, firestore: FirestoreManager) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNoteDialog(onNoteAdded: (Note) -> Unit, onDialogDismissed: () -> Unit) {
     var title by remember { mutableStateOf("") }
@@ -173,7 +185,7 @@ fun AddNoteDialog(onNoteAdded: (Note) -> Unit, onDialogDismissed: () -> Unit) {
                     content = ""
                 }
             ) {
-                Text(text = "Agregar")
+                Text(text = "Agregar", color = amarillo)
             }
         },
         dismissButton = {
@@ -182,22 +194,34 @@ fun AddNoteDialog(onNoteAdded: (Note) -> Unit, onDialogDismissed: () -> Unit) {
                     onDialogDismissed()
                 }
             ) {
-                Text(text = "Cancelar")
+                Text(text = "Cancelar", color = amarillo)
             }
         },
         text = {
             Column {
-                TextField(
+                OutlinedTextField(
+                    label = { Text(text = "Título", color = fondo) },
                     value = title,
-                    onValueChange = { title = it },
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                    label = { Text(text = "Título") }
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = celeste,
+                        unfocusedIndicatorColor = amarillo,
+                        cursorColor = Color.Yellow
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    onValueChange = { title = it }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = celeste,
+                        unfocusedIndicatorColor = amarillo,
+                        cursorColor = Color.Yellow
+                    ),
                     value = content,
                     onValueChange = { content = it },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
@@ -219,14 +243,14 @@ fun DeleteNoteDialog(onConfirmDelete: () -> Unit, onDismiss: () -> Unit) {
             Button(
                 onClick = onConfirmDelete
             ) {
-                Text("Aceptar")
+                Text("Aceptar", color = amarillo)
             }
         },
         dismissButton = {
             Button(
                 onClick = onDismiss
             ) {
-                Text("Cancelar")
+                Text("Cancelar", color = amarillo)
             }
         }
     )

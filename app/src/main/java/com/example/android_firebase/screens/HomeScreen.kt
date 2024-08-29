@@ -23,7 +23,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -36,9 +38,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -58,6 +62,9 @@ import com.example.android_firebase.navigation.Routes
 import com.example.android_firebase.screens.db.ContactsScreen
 import com.example.android_firebase.screens.db.NotesScreen
 import com.example.android_firebase.ui.storage.CloudStorageScreen
+import com.example.android_firebase.ui.theme.amarillo
+import com.example.android_firebase.ui.theme.amarillo2
+import com.example.android_firebase.ui.theme.fondo
 import com.example.android_firebase.utils.AnalyticsManager
 import com.example.android_firebase.utils.AuthManager
 import com.example.android_firebase.utils.CloudStorageManager
@@ -89,6 +96,9 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
     Scaffold(
         topBar = {
             TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = fondo,
+                ),
                 title = {
                     Row(
                         horizontalArrangement = Arrangement.Start,
@@ -123,18 +133,20 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
                                 text = if (!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenidx",
                                 fontSize = 20.sp,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                color = amarillo2
                             )
                             Text(
                                 text = if (!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
                                 fontSize = 12.sp,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                color = amarillo2
                             )
                         }
                     }
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(),
+                //colors = TopAppBarDefaults.smallTopAppBarColors(),
                 actions = {
                     IconButton(
                         onClick = {
@@ -142,7 +154,7 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
 
                         }
                     ) {
-                        Icon(Icons.Outlined.ExitToApp, contentDescription = "Cerrar sesión")
+                        Icon(Icons.Outlined.ExitToApp, contentDescription = "Cerrar sesión", tint = amarillo2)
                     }
                 }
             )
@@ -173,14 +185,14 @@ fun LogoutDialog(onConfirmLogout: () -> Unit, onDismiss: () -> Unit) {
             Button(
                 onClick = onConfirmLogout
             ) {
-                Text("Aceptar")
+                Text("Aceptar", color = amarillo)
             }
         },
         dismissButton = {
             Button(
                 onClick = onDismiss
             ) {
-                Text("Cancelar")
+                Text("Cancelar", color = amarillo)
             }
         }
     )
@@ -215,8 +227,8 @@ fun RowScope.AddItem(
     navController: NavHostController
 ) {
     NavigationBarItem(
-        label = { Text(text = screens.title) },
-        icon = { Icon(imageVector = screens.icon, contentDescription = "Icons") },
+        label = { Text(text = screens.title ) },
+        icon = { Icon(imageVector = screens.icon, contentDescription = "Icons", tint = amarillo2) },
         selected = currentDestination.hierarchy?.any {
             it.route == screens.route
         } == true,

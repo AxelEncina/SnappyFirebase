@@ -37,6 +37,8 @@ import androidx.core.content.FileProvider
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
+import com.example.android_firebase.ui.theme.amarillo
+import com.example.android_firebase.ui.theme.fondo
 
 import com.example.android_firebase.utils.CloudStorageManager
 import kotlinx.coroutines.launch
@@ -83,6 +85,7 @@ fun CloudStorageScreen(storage: CloudStorageManager) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
+                containerColor = fondo,
                 onClick = {
                     val permissionCheckResult =
                         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
@@ -93,7 +96,7 @@ fun CloudStorageScreen(storage: CloudStorageManager) {
                     }
                 },
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Photo")
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Photo", tint = amarillo)
             }
         }
     ) { contentPadding ->
@@ -128,7 +131,7 @@ fun CloudStorageScreen(storage: CloudStorageManager) {
 }
 
 @Composable
-fun CoilImage(
+fun CoilImage( // la libreria coil permite cargar imagenes de firestore
     imageUrl: String,
     contentDescription: String?,
     modifier: Modifier = Modifier,

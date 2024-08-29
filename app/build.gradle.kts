@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -21,15 +23,28 @@ android {
         }
     }
 
+    val localProperties = gradleLocalProperties(rootDir, providers)
+    val apiKey: String = localProperties.getProperty("API_KEY") ?: ""
+
     buildTypes {
-        release {
-            isMinifyEnabled = false
+
+        getByName("debug") {
+            versionNameSuffix = " - debug-1"
+            applicationIdSuffix = ".debug"
+            buildConfigField("String", "API_KEY", "\"$apiKey\"")
+        }
+
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "API_KEY", "\"$apiKey\"")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -78,6 +93,9 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
+
+    // Gemini
+    implementation(libs.generativeai)
 
 
 }
