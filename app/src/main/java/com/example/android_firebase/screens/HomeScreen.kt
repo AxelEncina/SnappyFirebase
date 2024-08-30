@@ -1,158 +1,115 @@
 package com.example.android_firebase.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.android_firebase.R
 import com.example.android_firebase.navigation.Routes
-import com.example.android_firebase.screens.login.ContactsScreen
-import com.example.android_firebase.screens.login.NotesScreen
-import com.example.android_firebase.utils.AnalyticsManager
-import com.example.android_firebase.utils.AuthManager
+import com.example.android_firebase.ui.theme.amarillo
+import com.example.android_firebase.ui.theme.celeste
+import com.example.android_firebase.viewmodel.HuntViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
-    analytics.logScreenView(screenName = Routes.Home.route)
-    val navController = rememberNavController()
+fun HomeScreen(navController: NavHostController, huntViewModel: HuntViewModel) {
 
-    val user = auth.getCurrentUser()
+    val lazyDog = FontFamily(
+        Font(R.font.lazy_dog)
+    )
 
-    var showDialog by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(25.dp))
+        Image(
+            painter = painterResource(id = R.drawable.logo2),
+            contentDescription = "Top Image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        )
 
-    val onLogoutConfirmed: () -> Unit = {
-        auth.signOut()
-        navigation.navigate(Routes.Login.route) {
-            popUpTo(Routes.Home.route) {
-                inclusive = true
-            }
-        }
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (user?.photoUrl != null) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(user.photoUrl)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = "Foto de perfil",
-                                placeholder = painterResource(id = R.drawable.profile),
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    //.padding(end = 8.dp)
-                                    .size(40.dp)
-                                    .clip(CircleShape))
-                        } else {
-                            Image(
-                                painter = painterResource(R.drawable.profile),
-                                contentDescription = "Foto de perfil por defecto",
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column {
-                            Text(
-                                text = if (!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenidx",
-                                fontSize = 20.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = if (!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
-                                fontSize = 12.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.smallTopAppBarColors(),
-                actions = {
-                    IconButton(
-                        onClick = {
-                            showDialog = true
-                        }
-                    ) {
-                        Icon(Icons.Outlined.ExitToApp, contentDescription = "Cerrar sesión")
-                    }
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = amarillo)) {
+                    append("SNAPPY")
                 }
-            )
-        },
-        bottomBar = {
-            BottomBar(navController = navController)
-        }
-    ) { contentPadding ->
-        Box(modifier = Modifier.padding(contentPadding)) {
-            if (showDialog) {
-                LogoutDialog(onConfirmLogout = {
-                    onLogoutConfirmed()
-                    showDialog = false
-                }, onDismiss = { showDialog = false })
-            }
-            BottomNavGraph(navController = navController)
+                withStyle(style = SpanStyle(color = celeste)) {
+                    append("AI")
+                }
+            },
+            style = TextStyle(fontSize = 60.sp, fontFamily = lazyDog)
+        )
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        Text(
+            text = "BIENVENIDO! \n\n Desea contestar una pregunta?",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontSize = 32.sp,
+                fontWeight = MaterialTheme.typography.bodyLarge.fontWeight),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        Text(
+            text = "🤯",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontSize = 32.sp,
+                fontWeight = MaterialTheme.typography.bodyLarge.fontWeight)
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        OutlinedButton(
+            onClick = {
+                navController.navigate(Routes.Pending.route)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .border(1.dp, amarillo, shape = RoundedCornerShape(50.dp))
+        ) {
+            Text(text = "Contestar".uppercase(), color = amarillo)
         }
     }
 }
-
+/*
 @Composable
 fun LogoutDialog(onConfirmLogout: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
@@ -179,8 +136,8 @@ fun LogoutDialog(onConfirmLogout: () -> Unit, onDismiss: () -> Unit) {
 @Composable
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
-        BottomNavScreen.Contact,
-        BottomNavScreen.Note
+        BottomNavScreen.Question,
+        BottomNavScreen.Response
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -220,26 +177,26 @@ fun RowScope.AddItem(
 
 @Composable
 fun BottomNavGraph(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = BottomNavScreen.Contact.route) {
-        composable(route = BottomNavScreen.Contact.route) {
-            ContactsScreen()
+    NavHost(navController = navController, startDestination = BottomNavScreen.Question.route) {
+        composable(route = BottomNavScreen.Question.route) {
+            QuestionScreen()
         }
-        composable(route = BottomNavScreen.Note.route) {
-            NotesScreen()
+        composable(route = BottomNavScreen.Response.route) {
+            ResponseScreen()
         }
     }
 }
 
 sealed class BottomNavScreen(val route: String, val title: String, val icon: ImageVector) {
-    object Contact : BottomNavScreen(
-        route = "contact",
-        title = "Contactos",
-        icon = Icons.Default.Person
+    object Question : BottomNavScreen(
+        route = "questions",
+        title = "Questions",
+        icon = Icons.Default.Send
     )
 
-    object Note : BottomNavScreen(
-        route = "notes",
-        title = "Notas",
-        icon = Icons.Default.List
+    object Response : BottomNavScreen(
+        route = "response",
+        title = "Response",
+        icon = Icons.Default.Done
     )
-}
+}*/

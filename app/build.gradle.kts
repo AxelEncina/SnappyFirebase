@@ -1,7 +1,12 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.gms.google-services")
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -21,13 +26,25 @@ android {
         }
     }
 
+    val localProperties = gradleLocalProperties(rootDir, providers)
+    val apiKey: String = localProperties.getProperty("API_KEY") ?: ""
+
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        /*
+        getByName("debug") {
+            versionNameSuffix = " - debug-1"
+            applicationIdSuffix = ".debug"
+            buildConfigField("String", "API_KEY", "\"$apiKey\"")
+        }*/
+
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "API_KEY", "\"$apiKey\"")
         }
     }
     compileOptions {
@@ -39,6 +56,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -68,6 +86,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+// Gemini
+    implementation(libs.generativeai)
+
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
@@ -77,5 +98,11 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
+    implementation (libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
 
 }
