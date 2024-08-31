@@ -29,5 +29,5 @@ class HuntViewModel : ViewModel() {
     private var currentIndex = 0
     var onFinished: (() -> Unit)? = null
 
-    val palabra: String = "Table"
+    val word: String = "Table"
 }

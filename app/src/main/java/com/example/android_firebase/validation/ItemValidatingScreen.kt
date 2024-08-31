@@ -40,7 +40,7 @@ fun ItemValidatingScreen(navController: NavHostController,
     LaunchedEffect(predictedName.value) {
         if (predictedName.value != null) {
             Log.d("ItemValidatingScreen", "Predicted name does not match the current item: ${predictedName.value} - ${predictedName.value?.trim()?.lowercase() == huntViewModel.currentItem.value?.trim()?.lowercase()} ${huntViewModel.currentItem.value}")
-            if (predictedName.value.equals(huntViewModel.palabra, ignoreCase = true)) {
+            if (predictedName.value.equals(huntViewModel.word, ignoreCase = true)) {
                 predictionViewModel.resetRetryCount()
                 navController.navigate(Routes.ItemValidationSuccess.route)
             } else {
@@ -71,7 +71,7 @@ fun ItemValidatingScreen(navController: NavHostController,
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "AI is validating the photo...",
+                text = "La IA está validando tu respuesta...",
                 style = MaterialTheme.typography.titleLarge)
         }
 

@@ -14,4 +14,6 @@ sealed class Routes(val route:String) {
 
     data object Finish : Routes("finish")
 
+    data object Notes: Routes("Notes Screen")
+
 }

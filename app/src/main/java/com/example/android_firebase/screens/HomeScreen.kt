@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,26 +13,49 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.android_firebase.R
 import com.example.android_firebase.navigation.Routes
@@ -40,6 +64,7 @@ import com.example.android_firebase.ui.theme.celeste
 import com.example.android_firebase.viewmodel.HuntViewModel
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavHostController, huntViewModel: HuntViewModel) {
 
@@ -47,67 +72,83 @@ fun HomeScreen(navController: NavHostController, huntViewModel: HuntViewModel) {
         Font(R.font.lazy_dog)
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(25.dp))
-        Image(
-            painter = painterResource(id = R.drawable.logo2),
-            contentDescription = "Top Image",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
+    var presses by remember { mutableIntStateOf(0) }
 
-        Spacer(modifier = Modifier.height(32.dp))
-        Text(
-            text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = amarillo)) {
-                    append("SNAPPY")
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = amarillo)) {
+                                append("SNAPPY")
+                            }
+                            withStyle(style = SpanStyle(color = celeste)) {
+                                append("AI")
+                            }
+                        },
+                        style = TextStyle(fontSize = 40.sp, fontFamily = lazyDog),
+                        modifier = Modifier.padding(100.dp, 0.dp, 0.dp, 0.dp)
+                    )
                 }
-                withStyle(style = SpanStyle(color = celeste)) {
-                    append("AI")
-                }
-            },
-            style = TextStyle(fontSize = 60.sp, fontFamily = lazyDog)
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Text(
-            text = "BIENVENIDO! \n\n Desea contestar una pregunta?",
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontSize = 32.sp,
-                fontWeight = MaterialTheme.typography.bodyLarge.fontWeight),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Text(
-            text = "🤯",
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontSize = 32.sp,
-                fontWeight = MaterialTheme.typography.bodyLarge.fontWeight)
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        OutlinedButton(
-            onClick = {
-                navController.navigate(Routes.Pending.route)
-            },
+            )
+        },
+        bottomBar = {
+            BottomBar(navController)
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navController.navigate(Routes.Pending.route) }) {
+                Icon(Icons.Default.Add, contentDescription = "Add")
+            }
+        }
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .border(1.dp, amarillo, shape = RoundedCornerShape(50.dp))
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Contestar".uppercase(), color = amarillo)
+            Spacer(modifier = Modifier.height(50.dp))
+            Image(
+                painter = painterResource(id = R.drawable.logo2),
+                contentDescription = "Top Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+                text = "BIENVENIDO!",
+                style = TextStyle(fontSize = 40.sp, fontFamily = lazyDog),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+
+            )
+
+            Spacer(modifier = Modifier.height(60.dp))
+
+            Text(
+                text = "Desea contestar una pregunta? 🤯",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = 32.sp,
+                    fontWeight = MaterialTheme.typography.bodyLarge.fontWeight),
+                textAlign = TextAlign.Center
+            )
+
+            //Spacer(modifier = Modifier.weight(1f))
+
         }
     }
+
 }
 /*
 @Composable
@@ -132,7 +173,7 @@ fun LogoutDialog(onConfirmLogout: () -> Unit, onDismiss: () -> Unit) {
         }
     )
 }
-
+*/
 @Composable
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
@@ -179,10 +220,10 @@ fun RowScope.AddItem(
 fun BottomNavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = BottomNavScreen.Question.route) {
         composable(route = BottomNavScreen.Question.route) {
-            QuestionScreen()
+            //QuestionScreen()
         }
         composable(route = BottomNavScreen.Response.route) {
-            ResponseScreen()
+            //ResponseScreen()
         }
     }
 }
@@ -199,4 +240,4 @@ sealed class BottomNavScreen(val route: String, val title: String, val icon: Ima
         title = "Response",
         icon = Icons.Default.Done
     )
-}*/
+}

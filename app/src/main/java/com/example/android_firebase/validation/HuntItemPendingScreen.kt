@@ -110,13 +110,13 @@ fun HuntItemPendingScreen(navController: NavHostController,
         ) {
             Text(
                 text = "QUE ES UNA...",
-                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Medium)
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 35.sp, fontWeight = FontWeight.Medium)
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = "TABLE?",
                 style = MaterialTheme.typography.displayLarge.copy(
-                    fontSize = 35.sp,
+                    fontSize = 60.sp,
                     fontWeight = FontWeight.W800)
             )
         }
@@ -128,7 +128,7 @@ fun HuntItemPendingScreen(navController: NavHostController,
             OutlinedButton(onClick = { //back home
                 navController.popBackStack()
             }, modifier = Modifier.
-                border(0.dp,amarillo, shape = RoundedCornerShape(50.dp))
+                border(0.dp,amarillo, shape = RoundedCornerShape(50.dp)).padding(0.dp,0.dp,20.dp,0.dp)
                 ) {
                 Text(text = "Volver", color = amarillo)
             }
