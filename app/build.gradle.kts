@@ -28,12 +28,6 @@ android {
 
     buildTypes {
 
-        getByName("debug") {
-            versionNameSuffix = " - debug-1"
-            applicationIdSuffix = ".debug"
-            buildConfigField("String", "API_KEY", "\"$apiKey\"")
-        }
-
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -54,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

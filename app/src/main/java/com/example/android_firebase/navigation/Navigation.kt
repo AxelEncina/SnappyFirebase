@@ -66,14 +66,3 @@ fun Navigation(context: Context, navController: NavHostController = rememberNavC
         }
     }
 }
-
-@Composable //para que no se llame cada vez que se renderiza
-fun trackScreen(name: String, analytics: FirebaseAnalytics) {
-    DisposableEffect(Unit) {
-        onDispose {
-            analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-                param(FirebaseAnalytics.Param.SCREEN_NAME, name)
-            }
-        }
-    }
-}
