@@ -85,7 +85,7 @@ fun HuntItemPendingScreen(navController: NavHostController,
             contentDescription = "Top Image",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(300.dp)
         )
 
         Spacer(modifier = Modifier.height(32.dp))

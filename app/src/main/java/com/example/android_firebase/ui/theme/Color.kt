@@ -12,3 +12,4 @@ val Pink40 = Color(0xFF7D5260)
 
 val amarillo = Color(0xFFFFC043)
 val celeste = Color(0xFF7CC6D6)
+val fondo = Color(0xFF23262B)

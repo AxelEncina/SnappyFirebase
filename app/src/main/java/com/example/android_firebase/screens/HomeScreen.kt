@@ -1,5 +1,6 @@
 package com.example.android_firebase.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -61,6 +63,7 @@ import com.example.android_firebase.R
 import com.example.android_firebase.navigation.Routes
 import com.example.android_firebase.ui.theme.amarillo
 import com.example.android_firebase.ui.theme.celeste
+import com.example.android_firebase.ui.theme.fondo
 import com.example.android_firebase.viewmodel.HuntViewModel
 
 
@@ -78,7 +81,7 @@ fun HomeScreen(navController: NavHostController, huntViewModel: HuntViewModel) {
         topBar = {
             TopAppBar(
                 colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    containerColor = fondo,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
@@ -101,8 +104,10 @@ fun HomeScreen(navController: NavHostController, huntViewModel: HuntViewModel) {
             BottomBar(navController)
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(Routes.Pending.route) }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+            FloatingActionButton(onClick = { navController.navigate(Routes.Pending.route) },
+                containerColor = fondo,
+                ) {
+                Icon(Icons.Default.Add, contentDescription = "Add", tint = amarillo)
             }
         }
     ) { innerPadding ->
@@ -118,7 +123,7 @@ fun HomeScreen(navController: NavHostController, huntViewModel: HuntViewModel) {
                 contentDescription = "Top Image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(300.dp)
 
             )
 
@@ -145,7 +150,7 @@ fun HomeScreen(navController: NavHostController, huntViewModel: HuntViewModel) {
             )
 
             //Spacer(modifier = Modifier.weight(1f))
-
+            //BottomNavGraph(navController = navController)
         }
     }
 
@@ -178,6 +183,7 @@ fun LogoutDialog(onConfirmLogout: () -> Unit, onDismiss: () -> Unit) {
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         BottomNavScreen.Question,
+        BottomNavScreen.Notes,
         BottomNavScreen.Response
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -217,18 +223,24 @@ fun RowScope.AddItem(
 }
 
 @Composable
-fun BottomNavGraph(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = BottomNavScreen.Question.route) {
+fun BottomNavGraph(navController: NavHostController, context: Context) {
+    NavHost(navController = navController, startDestination = BottomNavScreen.Notes.route) {
         composable(route = BottomNavScreen.Question.route) {
-            //QuestionScreen()
+            NotesScreen()
         }
         composable(route = BottomNavScreen.Response.route) {
-            //ResponseScreen()
+            NotesScreen()
         }
     }
 }
 
 sealed class BottomNavScreen(val route: String, val title: String, val icon: ImageVector) {
+    object Notes : BottomNavScreen(
+        route = "notes",
+        title = "Notes",
+        icon = Icons.Default.Home
+    )
+
     object Question : BottomNavScreen(
         route = "questions",
         title = "Questions",
@@ -237,7 +249,7 @@ sealed class BottomNavScreen(val route: String, val title: String, val icon: Ima
 
     object Response : BottomNavScreen(
         route = "response",
-        title = "Response",
+        title = "Answers",
         icon = Icons.Default.Done
     )
 }

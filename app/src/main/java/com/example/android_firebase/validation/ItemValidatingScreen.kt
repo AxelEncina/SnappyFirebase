@@ -39,7 +39,8 @@ fun ItemValidatingScreen(navController: NavHostController,
 
     LaunchedEffect(predictedName.value) {
         if (predictedName.value != null) {
-            Log.d("ItemValidatingScreen", "Predicted name does not match the current item: ${predictedName.value} - ${predictedName.value?.trim()?.lowercase() == huntViewModel.currentItem.value?.trim()?.lowercase()} ${huntViewModel.currentItem.value}")
+            Log.d("ItemValidatingScreen", "Predicted name does not match the current item: ${predictedName.value} - " +
+                    "${predictedName.value?.trim()?.lowercase() == huntViewModel.currentItem.value?.trim()?.lowercase()} ${huntViewModel.currentItem.value}")
             if (predictedName.value.equals(huntViewModel.word, ignoreCase = true)) {
                 predictionViewModel.resetRetryCount()
                 navController.navigate(Routes.ItemValidationSuccess.route)
